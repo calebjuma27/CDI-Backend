@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        uganda_temp_rainfall_ndv_stats
+# Name:        uganda_temp_rainfall_ndvi_stats
 # Purpose:      calculates the mean temp, rainfall and ndvi statistics for each admin region
 #
 # Author:      caleb
