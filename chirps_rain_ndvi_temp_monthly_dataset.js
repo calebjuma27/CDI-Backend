@@ -52,10 +52,11 @@ function chirpsRainfall(startDay, endDay) {
 function modisNDVI(startDay, endDay) {
   
     // get Modis NDVI mothly dataset
-    var ndvi = ee.ImageCollection('MODIS/061/MOD13A2')
+    var ndvi = ee.ImageCollection('MODIS/061/MOD13A2') 
       .filter(ee.Filter.date(startDay, endDay))
       .select('NDVI')
       .reduce(ee.Reducer.mean())
+      .multiply(0.0001) //scale it to be between 0 an 1
       .clip(regionAoi);
      
 
@@ -63,6 +64,23 @@ function modisNDVI(startDay, endDay) {
 
 }
 
+
+//calculate Temperature
+
+function modisTemp(startDay, endDay) {
+  
+    var landSurfaceTemperature = ee.ImageCollection('MODIS/061/MOD11A1')
+      .filter(ee.Filter.date(startDay, endDay))
+      .select('LST_Day_1km')
+      .reduce(ee.Reducer.mean())
+      .multiply(0.02) //multiply by 0.02 and subtract 273.15 to convert to degrees
+      .subtract(273.15)
+      .clip(regionAoi);
+
+
+return landSurfaceTemperature
+
+}
 
 
 // calculate yearly statistics
@@ -106,8 +124,9 @@ function calculateStats(year, durationInYears, regionAoi) {
       // Call the satelliteModis function and calculate monthly rainfall
       var monthlyNDVI = modisNDVI(startDay, endDay)
       var monthlyRain, monthlyClassifiedRain = chirpsRainfall(startDay, endDay);
-
-
+      var monthlyTemp = modisTemp(startDay, endDay)
+      
+      /*
       // export rainfall_raster
       Export.image.toDrive({
       image:monthlyRain,
@@ -132,17 +151,38 @@ function calculateStats(year, durationInYears, regionAoi) {
       region:regionAoi
       });
       
+      
+      
+      // export monthly modis temperature
+      Export.image.toDrive({
+      image:monthlyTemp,
+      description:"" + "temp"+"_"+ee.Number(k).format('%02d').getInfo()+"_"+currentYear,
+      scale:5566,
+      crs:'EPSG:4326',
+      folder:'GEE_FAO_Temp',
+      maxPixels:1e13,
+      region:regionAoi
+      });  
+        
+        
+        
       // export monthly NDVI anaomaly
       Export.image.toDrive({
       image:monthlyNDVI,
       description:"" + "ndvi"+"_"+ee.Number(k).format('%02d').getInfo()+"_"+currentYear,
       scale:5566,
       crs:'EPSG:4326',
-      folder:'GEE_FAO_NDVI',
+      folder:'GEE_FAO_scaled_NDVI',
       maxPixels:1e13,
       region:regionAoi
       });
+      */
+
       
+    
+    
+    
+
 
     }
   }
@@ -151,7 +191,8 @@ function calculateStats(year, durationInYears, regionAoi) {
 }
 
 
-var monthlyRainfallNDVI=calculateStats(2001,24,regionAoi)  
+var monthlyRainfallTempNDVI=calculateStats(2001,24,regionAoi)  
+
 
 
 

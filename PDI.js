@@ -1,4 +1,4 @@
-var aoi = ee.FeatureCollection("projects/ee-benardonyango16/assets/UG_CDI/UG_Admin_0");
+var aoi = ee.FeatureCollection("projects/boscondeka/assets/UG_CDI/UG_Admin_0");
 
 // This is a script for implementing the Precipitation drought Index - PDI - using the chirps data
 
